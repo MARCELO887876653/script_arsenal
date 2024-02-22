@@ -1,0 +1,65 @@
+--Abaixo estara a Lib UI
+
+local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/7yhx/kwargs_Ui_Library/main/source.lua"))()
+
+local UI = Lib:Create{
+   Theme = "Dark", -- or any other theme
+   Size = UDim2.new(0, 555, 0, 400) -- default
+}
+
+local Main = UI:Tab{
+   Name = "inicio"
+}
+
+local Divider = Main:Divider{
+   Name = "inicio shit"
+}
+
+local QuitDivider = Main:Divider{
+   Name = "sair"
+}
+
+local KillAll = Divider:Button{
+    Name = "ESP",
+    Description = "ESP ATIVADO",
+    Callback = function CreateESP(player)
+        local DistanceLabel = Instance.new("TextLabel")
+        DistanceLabel.Name = "ESP_Distance"
+        DistanceLabel.Text = ""
+        DistanceLabel.Size = UDim2.new(0, 100, 0, 20)
+        DistanceLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+        DistanceLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+        DistanceLabel.BackgroundTransparency = 1
+        DistanceLabel.Font = Enum.Font.SourceSans
+        DistanceLabel.TextColor3 = player.Team == LocalPlayer.Team and Color3.new(0, 0, 1) or Color3.new(1, 0, 0)
+        DistanceLabel.TextStrokeTransparency = 0.5
+        DistanceLabel.Parent = player.Character.Head
+
+        local function UpdateDistance()
+            local targetPosition = player.Character.Head.Position
+            local localPosition = LocalPlayer.Character.Head.Position
+            local distance = (targetPosition - localPosition).Magnitude
+            DistanceLabel.Text = string.format("(%d) %s\nVida: %d", math.floor(distance), player.Name, player.Health)
+        end
+
+        while true do
+            wait(1)  -- Intervalo de atualização (em segundos)
+            if espEnabled then
+                UpdateDistance()
+            else
+                DistanceLabel.Text = ""
+            end
+        end
+    end
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            CreateESP(player)
+        end
+    end
+
+    game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessedEvent)
+        if not gameProcessedEvent and input.KeyCode == Enum.KeyCode.E then
+            espEnabled = not espEnabled
+        end
+    end)
